@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { SearchBar } from "./SearchBar";
 import { AboutDialog } from "./AboutDialog";
-
+import ChatDialog from "./ChatDialog";
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const location = useLocation();
@@ -42,6 +42,7 @@ const Navbar = () => {
       >
         Live Stream
       </Link>
+      <ChatDialog />
       <AboutDialog />
     </>
   );
