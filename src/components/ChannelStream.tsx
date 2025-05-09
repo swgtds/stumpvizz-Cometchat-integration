@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import VideoPlayer from "./VideoPlayer";
 import { format, isAfter, isBefore, parse } from "date-fns";
+import { COMETCHAT_GROUPS } from "@/config/cometchat";
+import ChatComponent from "./ChatComponent";
+import { useAuth } from "@/contexts/AuthContext";
+import ChatLogin from "./ChatLogin";
+
 
 // Converts "yyyy-MM-dd" to "dd MMM, yyyy"
 const formatDate = (dateStr: string) => format(new Date(dateStr), "do MMM, yyyy");
@@ -24,6 +29,10 @@ const ChannelStream = () => {
   const [channel, setChannel] = useState<any | null>(null);
   const [isAvailable, setIsAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated } = useAuth();
+
+  
+  const matchChatGroupId = channelId ? `${COMETCHAT_GROUPS.LIVE_MATCH_PREFIX}${channelId}` : '';
 
   useEffect(() => {
     const fetchChannelData = async () => {
@@ -160,8 +169,21 @@ const ChannelStream = () => {
           Live Match - {formatDate(channel.match?.date)}
         </p>
       </div>
-      <div className="w-full max-w-screen-lg mx-auto aspect-video">
-        <VideoPlayer src={channel.streamUrl} isIframe={true} isLive />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <VideoPlayer
+            src={channel.streamUrl} isIframe={true}
+            isLive
+          />
+        </div>
+        <div className="lg:col-span-1">
+          <h2 className="text-xl font-bold mb-4">Live Chat</h2>
+          {isAuthenticated ? (
+            <ChatComponent groupId={matchChatGroupId} modern={true} />
+          ) : (
+            <ChatLogin />
+          )}
+        </div>
       </div>
     </div>
   );

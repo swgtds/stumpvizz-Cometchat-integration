@@ -12,6 +12,7 @@ import Highlights from "./pages/Highlights"
 import LiveStream from "./pages/LiveStream"
 import ChannelStream from "./components/ChannelStream"
 import NotFound from "./pages/NotFound"
+import { AuthProvider } from "@/contexts/AuthContext"
 
 function App() {
   const queryClient = new QueryClient()
@@ -27,9 +28,11 @@ function App() {
   }, [])
 
   return (
+    
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <AuthProvider>
           <TooltipProvider>
             <div className={`transition-opacity duration-500 ${isInitializing ? 'opacity-0' : 'opacity-100'}`}>
               <Toaster />
@@ -44,6 +47,7 @@ function App() {
               </Routes>
             </div>
           </TooltipProvider>
+          </AuthProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </BrowserRouter>
