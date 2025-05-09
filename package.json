@@ -11,6 +11,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cometchat/calls-sdk-javascript": "^4.1.0",
+    "@cometchat/chat-sdk-javascript": "^4.0.12",
+    "@cometchat/chat-uikit-react": "^6.0.4",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
