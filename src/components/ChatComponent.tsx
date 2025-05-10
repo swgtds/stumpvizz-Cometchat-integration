@@ -20,8 +20,8 @@ interface ChatMessage {
 }
 
 interface ChatComponentProps {
-  groupId?: string; // Use custom group ID or default to global
-  modern?: boolean; // New prop for modern UI
+  groupId?: string; 
+  modern?: boolean;
 }
 
 const ChatComponent: React.FC<ChatComponentProps> = ({ 
@@ -34,14 +34,12 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   const [isJoined, setIsJoined] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Function to scroll to the bottom of messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Handle user logout
+  // user logout
   const handleLogout = async () => {
-    // Reset local state
     setMessages([]);
     setIsJoined(false);
     
@@ -49,13 +47,12 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
     await logout();
   };
 
-  // Join the chat group
+  // Join group chart
   useEffect(() => {
     const joinGroup = async () => {
       if (!isAuthenticated || !user) return;
       
       try {
-        // First check if group exists, if not, create it
         try {
   await CometChat.getGroup(groupId);
 } catch (error) {
@@ -68,10 +65,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   await CometChat.createGroup(group);
 }
 
-// ✅ JOIN THE GROUP before sending or fetching messages
-//await CometChat.joinGroup(groupId, CometChat.GROUP_TYPE.PUBLIC, "");
 setIsJoined(true);
-
         
         // Fetch previous messages
         const limit = 50;
@@ -83,16 +77,13 @@ setIsJoined(true);
         // Safely extract data from message objects
         const previousMessages = await messagesRequest.fetchPrevious();
         const typedMessages: ChatMessage[] = previousMessages.map((msg: any) => {
-          // Extract message data safely
           let messageText = "";
           
-          // Handle TextMessage type
           if (msg instanceof CometChat.TextMessage && typeof msg.getText === 'function') {
             messageText = msg.getText();
           }
           
           return {
-            // Extract data safely using getters and convert number to string where needed
             id: msg.getId ? msg.getId() : String(Date.now()),
             text: messageText,
             sender: {
@@ -104,15 +95,12 @@ setIsJoined(true);
         });
         
         setMessages(typedMessages);
-        
-        // Add message listener
         CometChat.addMessageListener(
           groupId,
           new CometChat.MessageListener({
             onTextMessageReceived: (textMessage: any) => {
               if (textMessage && textMessage instanceof CometChat.TextMessage && typeof textMessage.getText === 'function') {
                 const typedMessage: ChatMessage = {
-                  // Convert number to string for id where needed
                   id: textMessage.getId ? String(textMessage.getId()) : String(Date.now()),
                   text: textMessage.getText ? textMessage.getText() : "",
                   sender: {
@@ -136,7 +124,6 @@ setIsJoined(true);
     joinGroup();
     
     return () => {
-      // Remove message listener when component unmounts
       CometChat.removeMessageListener(groupId);
     };
   }, [groupId, isAuthenticated, user]);
@@ -146,7 +133,6 @@ setIsJoined(true);
     scrollToBottom();
   }, [messages]);
   
-  // Send message function
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -162,7 +148,7 @@ setIsJoined(true);
       const sentMessage = await CometChat.sendMessage(textMessage);
       
       if (sentMessage && sentMessage instanceof CometChat.TextMessage && typeof sentMessage.getText === 'function') {
-        // Extract data safely using getters and convert number to string where needed
+
         const typedMessage: ChatMessage = {
           id: sentMessage.getId ? String(sentMessage.getId()) : String(Date.now()),
           text: sentMessage.getText ? sentMessage.getText() : "",
@@ -193,7 +179,7 @@ setIsJoined(true);
     );
   }
   
-  // Modern chat UI
+  // Custom Chaut UI
   if (modern) {
     return (
       <Card className="w-full rounded-xl overflow-hidden shadow-lg border-0">
@@ -223,7 +209,7 @@ setIsJoined(true);
           
           <div className="p-4 pb-0">
             <p className="text-sm text-muted-foreground mb-4 bg-muted/30 p-3 rounded-lg">
-              Welcome to the group chat! Discuss the match with other fans in real-time.
+              Welcome to the group chat. Discuss the match with other fans in real-time.
             </p>
             
             <ScrollArea className="h-[320px] pr-4">
@@ -285,7 +271,6 @@ setIsJoined(true);
     );
   }
   
-  // Original chat UI
   return (
     <Card className="w-full">
       <CardContent className="p-4 h-[400px] flex flex-col">

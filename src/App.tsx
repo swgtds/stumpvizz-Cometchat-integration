@@ -22,7 +22,7 @@ function App() {
     // Simulate initial app initialization
     const timer = setTimeout(() => {
       setIsInitializing(false)
-    }, 1500) // Shorter animation duration
+    }, 1500) 
 
     return () => clearTimeout(timer)
   }, [])
