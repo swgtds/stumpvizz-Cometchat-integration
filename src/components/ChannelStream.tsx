@@ -4,14 +4,21 @@ import { fetchChannels } from "@/config/channels"; // Fetch men's matches dynami
 import { fetchWomenChannels } from "@/config/women-channels"; // Fetch women's matches dynamically
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, UserPlus } from "lucide-react";
 import VideoPlayer from "./VideoPlayer";
 import { format, isAfter, isBefore, parse } from "date-fns";
 import { COMETCHAT_GROUPS } from "@/config/cometchat";
 import ChatComponent from "./ChatComponent";
 import { useAuth } from "@/contexts/AuthContext";
 import ChatLogin from "./ChatLogin";
-
+import UserRegistrationForm from "./UserRegistrationForm";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogHeader, 
+  DialogTitle
+} from "@/components/ui/dialog";
 
 // Converts "yyyy-MM-dd" to "dd MMM, yyyy"
 const formatDate = (dateStr: string) => format(new Date(dateStr), "do MMM, yyyy");
@@ -30,9 +37,14 @@ const ChannelStream = () => {
   const [isAvailable, setIsAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const { isAuthenticated } = useAuth();
+  const [showRegistration, setShowRegistration] = useState(false);
 
   
   const matchChatGroupId = channelId ? `${COMETCHAT_GROUPS.LIVE_MATCH_PREFIX}${channelId}` : '';
+
+  const handleRegistrationSuccess = () => {
+    setShowRegistration(false);
+  };
 
   useEffect(() => {
     const fetchChannelData = async () => {
@@ -153,39 +165,70 @@ const ChannelStream = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
-      <Button
-        variant="outline"
-        className="mb-4"
-        onClick={() => navigate("/live-stream")}
-      >
-        <ArrowLeft className="mr-2" /> Back to Channels
-      </Button>
-      <div className="flex flex-col space-y-4">
-        <h1 className="text-3xl font-bold">
-          {channel.match?.team1} vs {channel.match?.team2}
-        </h1>
-        <p className="text-muted-foreground">
-          Live Match - {formatDate(channel.match?.date)}
-        </p>
+    <>
+      <div className="container mx-auto px-4 py-8 space-y-6">
+        <Button
+          variant="outline"
+          className="mb-4"
+          onClick={() => navigate("/live-stream")}
+        >
+          <ArrowLeft className="mr-2" /> Back to Channels
+        </Button>
+        <div className="flex flex-col space-y-4">
+          <h1 className="text-3xl font-bold">
+            {channel.match?.team1} vs {channel.match?.team2}
+          </h1>
+          <p className="text-muted-foreground">
+            Live Match - {channel.match?.date}
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <VideoPlayer
+              src={channel.streamUrl} isIframe={true}
+              isLive
+            />
+          </div>
+          <div className="lg:col-span-1">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Live Chat</h2>
+              {!isAuthenticated && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowRegistration(true)}
+                  className="flex items-center gap-1"
+                >
+                  <UserPlus className="h-3 w-3" />
+                  <span>Register</span>
+                </Button>
+              )}
+            </div>
+            {isAuthenticated ? (
+              <ChatComponent groupId={matchChatGroupId} modern={true} />
+            ) : (
+              <ChatLogin />
+            )}
+          </div>
+        </div>
       </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <VideoPlayer
-            src={channel.streamUrl} isIframe={true}
-            isLive
+
+      <Dialog open={showRegistration} onOpenChange={setShowRegistration}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create Chat Account</DialogTitle>
+            <DialogDescription>
+              Register a new account to join the live match discussion
+            </DialogDescription>
+          </DialogHeader>
+          <UserRegistrationForm 
+            onSuccess={handleRegistrationSuccess}
+            onCancel={() => setShowRegistration(false)}
           />
-        </div>
-        <div className="lg:col-span-1">
-          <h2 className="text-xl font-bold mb-4">Live Chat</h2>
-          {isAuthenticated ? (
-            <ChatComponent groupId={matchChatGroupId} modern={true} />
-          ) : (
-            <ChatLogin />
-          )}
-        </div>
-      </div>
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

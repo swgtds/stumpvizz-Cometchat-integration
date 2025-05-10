@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { CometChat } from "@cometchat/chat-sdk-javascript"
-import { COMETCHAT_CONSTANTS } from "@/config/cometchat"
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { CometChat } from "@cometchat/chat-sdk-javascript";
+import { COMETCHAT_CONSTANTS, COMETCHAT_API } from "@/config/cometchat";
+import { useToast } from "@/components/ui/use-toast";
 
 // Define user type
 interface User {
@@ -16,6 +17,14 @@ interface UserProfileUpdate {
   nickname?: string;
 }
 
+interface NewUser {
+  uid: string;
+  name: string;
+  email?: string;
+  avatar?: string;
+  metadata?: any;
+}
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -23,8 +32,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   isLoading: boolean;
   updateUserProfile: (updates: UserProfileUpdate) => void;
+  createUser: (userData: NewUser) => Promise<boolean>;
 }
-
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
@@ -32,12 +41,13 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
   isLoading: true,
   updateUserProfile: () => {},
+  createUser: async () => false
 });
 
-// For demo purposes, use localStorage to store user data
+// For demo purposes, we'll use localStorage to store user data
 const STORAGE_KEY = "cometchat_user";
 
-// Initialize CometChat
+// initialize CometChat
 const initCometChat = async () => {
   try {
     const appSetting = new CometChat.AppSettingsBuilder()
@@ -57,13 +67,12 @@ const initCometChat = async () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
-// initialize cometchat
+  // Initialize CometChat
   useEffect(() => {
     const setupCometChat = async () => {
       await initCometChat();
-      
-      // to check if user is logged in to CometChat
       try {
         const cometUser = await CometChat.getLoggedinUser();
         if (cometUser) {
@@ -76,15 +85,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } catch (e) {
               console.error("Error parsing stored user:", e);
               localStorage.removeItem(STORAGE_KEY);
-              // logout from CometChat as well
               await CometChat.logout();
             }
           } else {
-            // create a user object from CometChat user
             const newUser = {
               id: cometUser.getUid(),
               username: cometUser.getName() || cometUser.getUid(),
-              email: cometUser.getUid() + "@example.com", // CometChat doesn't store emails by default
+              email: cometUser.getUid() + "@example.com", 
             };
             setUser(newUser);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
@@ -100,16 +107,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setupCometChat();
   }, []);
 
-  // Login function using CometChat
-  const login = async (uid: 'cometchat-uid-1'): Promise<boolean> => {
+  // Login function using CometChat 
+  const login = async (uid: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      
-      // Login with CometChat
       const cometUser = await CometChat.login(uid, COMETCHAT_CONSTANTS.AUTH_KEY);
       
       if (cometUser) {
-        // Create user object
         const newUser = {
           id: cometUser.getUid(),
           username: cometUser.getName() || cometUser.getUid(),
@@ -135,7 +139,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      // Logout from CometChat
       await CometChat.logout();
       
       localStorage.removeItem(STORAGE_KEY);
@@ -156,10 +159,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
-      
-      setUser(updatedUser);
+          setUser(updatedUser);
       
       if (updates.nickname) {
+    
         const cometChatUser = new CometChat.User(user.id);
         cometChatUser.setName(updates.nickname);
         CometChat.updateUser(cometChatUser, COMETCHAT_CONSTANTS.AUTH_KEY).catch(error => {
@@ -171,6 +174,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const createUser = async (userData: NewUser): Promise<boolean> => {
+    try {
+      setIsLoading(true);
+      
+      if (!COMETCHAT_CONSTANTS.REST_API_KEY) {
+        toast({
+          title: "Error",
+          description: "REST API Key not configured",
+          variant: "destructive"
+        });
+        return false;
+      }
+
+      const response = await fetch(
+        COMETCHAT_API.CREATE_USER(COMETCHAT_CONSTANTS.APP_ID, COMETCHAT_CONSTANTS.REGION), 
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apiKey': COMETCHAT_CONSTANTS.REST_API_KEY
+          },
+          body: JSON.stringify(userData)
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast({
+          title: "Failed to create user",
+          description: errorData.message || "An error occurred",
+          variant: "destructive"
+        });
+        return false;
+      }
+
+      const data = await response.json();
+      toast({
+        title: "User created successfully",
+        description: `User ${data.data.name} has been created`
+      });
+      
+      return true;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create user. Please try again.",
+        variant: "destructive"
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider 
       value={{ 
@@ -179,7 +237,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login, 
         logout,
         isLoading,
-        updateUserProfile
+        updateUserProfile,
+        createUser
       }}
     >
       {children}
