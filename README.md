@@ -1,6 +1,7 @@
 # 🏏 StumpVizz CometChat Integration
 
 This is a simplified version of my project [StumpVizz](https://github.com/swgtds/stumpvizz), built to demonstrate **CometChat UI Kit integration** in a real-world context.
+**YOU CAN ACESS THIS WEBSITE FROM THIS [LINK]() TO CHECK IT**
 
 ## What is this?
 
@@ -32,7 +33,7 @@ I have used a **cricket-themed live streaming concept** where fans can:
 
 ### 1. Clone the Repo
 ```bash
-git clone https://github.com/YOUR_USERNAME/stumpvizz-Cometchat-integration.git
+git clone https://github.com/swgtds/stumpvizz-Cometchat-integration.git
 cd stumpvizz-Cometchat-integration
 npm install
 ```
@@ -57,4 +58,4 @@ VITE_COMETCHAT_AUTH_KEY= <Your Auth Key>
 ```bash
 npm run dev
 ```
-DM me on [Linkedin](https://www.linkedin.com/in/swgtds/) or [Email me](mailto:swagatadas003@gmail.com)if you run into any issues
+DM me on [Linkedin](https://www.linkedin.com/in/swgtds/) or [Email me](mailto:swagatadas003@gmail.com) if you run into any issues
