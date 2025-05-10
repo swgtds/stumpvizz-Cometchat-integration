@@ -48,20 +48,7 @@ export const fetchChannels = async (): Promise<Channel[]> => {
 
   return [
     {
-      id: "a-vs-b",
-      name: "Live Match 1",
-      startTime: "00:00",               
-      endTime: "23:59",                 
-      streamUrl: streamLink,
-      match: {
-        team1: "Team A",
-        team2: "Team B",
-        date: "2025-05-10",             
-        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
-      },
-    },
-    {
-      id: "a-vs-b",
+      id: "a1-vs-b1",
       name: "Live Match 1",
       startTime: "00:00",               
       endTime: "23:59",                 
@@ -74,7 +61,7 @@ export const fetchChannels = async (): Promise<Channel[]> => {
       },
     },
     {
-      id: "a-vs-b",
+      id: "a2-vs-b2",
       name: "Live Match 1",
       startTime: "00:00",               
       endTime: "23:59",                 
@@ -87,7 +74,7 @@ export const fetchChannels = async (): Promise<Channel[]> => {
       },
     },
     {
-      id: "a-vs-b",
+      id: "a3-vs-b3",
       name: "Live Match 1",
       startTime: "00:00",               
       endTime: "23:59",                 
@@ -100,7 +87,7 @@ export const fetchChannels = async (): Promise<Channel[]> => {
       },
     },
     {
-      id: "a-vs-b",
+      id: "a4-vs-b4",
       name: "Live Match 1",
       startTime: "00:00",               
       endTime: "23:59",                 
@@ -113,7 +100,7 @@ export const fetchChannels = async (): Promise<Channel[]> => {
       },
     },
     {
-      id: "a-vs-b",
+      id: "a5-vs-b5",
       name: "Live Match 1",
       startTime: "00:00",               
       endTime: "23:59",                 
@@ -126,7 +113,7 @@ export const fetchChannels = async (): Promise<Channel[]> => {
       },
     },
     {
-      id: "a-vs-b",
+      id: "a6-vs-b6",
       name: "Live Match 1",
       startTime: "00:00",               
       endTime: "23:59",                 
@@ -139,7 +126,7 @@ export const fetchChannels = async (): Promise<Channel[]> => {
       },
     },
     {
-      id: "a-vs-b",
+      id: "a7-vs-b7",
       name: "Live Match 1",
       startTime: "00:00",               
       endTime: "23:59",                 
@@ -152,7 +139,7 @@ export const fetchChannels = async (): Promise<Channel[]> => {
       },
     },
     {
-      id: "a-vs-b",
+      id: "a8-vs-b8",
       name: "Live Match 1",
       startTime: "00:00",               
       endTime: "23:59",                 
@@ -165,7 +152,7 @@ export const fetchChannels = async (): Promise<Channel[]> => {
       },
     },
     {
-      id: "a-vs-b",
+      id: "a9-vs-b9",
       name: "Live Match 1",
       startTime: "00:00",               
       endTime: "23:59",                 
@@ -174,6 +161,19 @@ export const fetchChannels = async (): Promise<Channel[]> => {
         team1: "Team A",
         team2: "Team B",
         date: "2025-05-19",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+    {
+      id: "a6-vs-b6",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-20",             
         thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
       },
     },

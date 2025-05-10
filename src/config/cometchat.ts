@@ -9,8 +9,8 @@ export const COMETCHAT_CONSTANTS = {
 };
   
   export const COMETCHAT_GROUPS = {
-    GLOBAL_GROUP: "global_group",
-    LIVE_MATCH_PREFIX: "live_match_"
+    GLOBAL_GROUP: "global-group",
+    LIVE_MATCH_PREFIX: "live-match-"
   };
 
   // api endpoints

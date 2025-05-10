@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { CometChat } from "@cometchat/chat-sdk-javascript"
 import { useAuth } from "@/contexts/AuthContext"
@@ -28,7 +27,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   groupId = COMETCHAT_GROUPS.GLOBAL_GROUP,
   modern = false
 }) => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isJoined, setIsJoined] = useState(false);
@@ -38,15 +37,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // user logout
-  const handleLogout = async () => {
-    setMessages([]);
-    setIsJoined(false);
-    
-    // Call auth context logout
-    await logout();
-  };
-
   // Join group chart
   useEffect(() => {
     const joinGroup = async () => {
@@ -54,18 +44,29 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
       
       try {
         try {
-  await CometChat.getGroup(groupId);
-} catch (error) {
-  const group = new CometChat.Group(
-    groupId,
-    groupId === COMETCHAT_GROUPS.GLOBAL_GROUP ? "Global Chat" : `Live Match Chat`,
-    CometChat.GROUP_TYPE.PUBLIC,
-    ""
-  );
-  await CometChat.createGroup(group);
-}
+          await CometChat.getGroup(groupId);
+        } catch (error) {
+          const group = new CometChat.Group(
+            groupId,
+            groupId === COMETCHAT_GROUPS.GLOBAL_GROUP ? "Global Chat" : `Live Match Chat`,
+            CometChat.GroupType.Public,
+            ""
+          );
+          await CometChat.createGroup(group);
+        }
 
-setIsJoined(true);
+        try {
+          await CometChat.joinGroup(groupId, CometChat.GroupType.Public, "");
+        } catch (error: any) {
+          // If user is already joined, we can proceed
+          if (error.code === "ERR_ALREADY_JOINED") {
+            console.log("User is already a member of the group");
+          } else {
+            throw error; // Re-throw other errors
+          }
+        }
+        
+        setIsJoined(true);
         
         // Fetch previous messages
         const limit = 50;
@@ -193,17 +194,6 @@ setIsJoined(true);
               <div className="text-xs bg-white/20 px-2 py-1 rounded-full">
                 {messages.length} messages
               </div>
-              <div className="flex items-center gap-2 text-white cursor-pointer" onClick={handleLogout}>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={handleLogout}
-                className="text-white hover:bg-white/20 rounded-full h-8 w-8 p-0"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
-              <span className="text-sm font-medium">Logout</span>
-              </div>
             </div>
           </div>
           
@@ -276,15 +266,6 @@ setIsJoined(true);
       <CardContent className="p-4 h-[400px] flex flex-col">
       <div className="flex justify-between items-center mb-3">
           <h3 className="text-sm font-medium">Cricket Chat</h3>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleLogout}
-            className="flex items-center gap-1 text-xs h-8"
-          >
-            <LogOut className="h-3 w-3" />
-            Logout
-          </Button>
         </div>
         <ScrollArea className="flex-grow h-[340px] mb-4">
           <div className="space-y-4 p-2">
