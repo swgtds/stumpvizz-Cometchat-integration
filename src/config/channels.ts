@@ -1,4 +1,4 @@
-export interface Channel {
+/*export interface Channel {
   id: string;
   name: string;
   startTime: string;
@@ -27,4 +27,155 @@ export const fetchChannels = async (): Promise<Channel[]> => {
     console.error(error);
     return [];
   }
+};
+*/
+export interface Channel {
+  id: string;
+  name: string;
+  startTime: string;
+  endTime: string;
+  streamUrl: string;
+  match?: {
+    team1: string;
+    team2: string;
+    date: string;
+    thumbnail: string;
+  };
+};
+
+export const fetchChannels = async (): Promise<Channel[]> => {
+  const streamLink = "https://www.youtube.com/embed/Q14J-bnjtMQ"; 
+
+  return [
+    {
+      id: "a-vs-b",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-10",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+    {
+      id: "a-vs-b",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-11",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+    {
+      id: "a-vs-b",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-12",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+    {
+      id: "a-vs-b",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-13",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+    {
+      id: "a-vs-b",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-14",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+    {
+      id: "a-vs-b",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-15",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+    {
+      id: "a-vs-b",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-16",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+    {
+      id: "a-vs-b",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-17",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+    {
+      id: "a-vs-b",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-18",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+    {
+      id: "a-vs-b",
+      name: "Live Match 1",
+      startTime: "00:00",               
+      endTime: "23:59",                 
+      streamUrl: streamLink,
+      match: {
+        team1: "Team A",
+        team2: "Team B",
+        date: "2025-05-19",             
+        thumbnail: "https://images.sidearmdev.com/fit?url=https%3a%2f%2fdxbhsrqyrr690.cloudfront.net%2fsidearm.nextgen.sites%2fuoit.sidearmsports.com%2fimages%2f2020%2f6%2f5%2f69576197_1378820782272472_6963252643883909120_o_15.jpg&height=444&width=591&type=webp",
+      },
+    },
+  ];
 };
