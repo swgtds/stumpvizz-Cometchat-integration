@@ -1,7 +1,8 @@
 # 🏏 StumpVizz CometChat Integration
 
 This is a simplified version of my project [StumpVizz](https://github.com/swgtds/stumpvizz), built to demonstrate **CometChat UI Kit integration** in a real-world context.
-**YOU CAN ACESS THIS WEBSITE FROM THIS [LINK]() TO CHECK IT**
+I have also deployed the project
+<h2>YOU CAN ACCESS THE WEBSITE FROM THIS LINK TO CHECK IT(<a href="https://stumpvizz-cometchat-integration.vercel.app/">CLICK HERE</a>)</h2>
 
 ## What is this?
 
@@ -46,7 +47,7 @@ Create an app by following the steps and get :
 - Auth Key
 from the Home/Overview page!
 
-### 3. Create an Environment Variable to Store your credentials
+### 3. Create an Environment Variable(.env) in the Root Directory to store your credentials
 ```bash
 VITE_BACKEND_URL= <Your backend URL>
 VITE_COMETCHAT_APP_ID=<Your App ID> 
