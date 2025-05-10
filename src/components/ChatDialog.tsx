@@ -13,7 +13,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import UserRegistrationForm from "./UserRegistrationForm";
-import { COMETCHAT_GROUPS } from "@/config/cometchat";
 
 export const ChatDialog = () => {
   const { isAuthenticated, login, logout, user } = useAuth();
@@ -58,23 +57,18 @@ export const ChatDialog = () => {
         <DialogHeader className="flex flex-row items-center justify-between">
           <div>
             <DialogTitle>Cricket Fan Chat</DialogTitle>
-            <DialogDescription>
-              {showRegistration 
-                ? "Create a new chat account" 
-                : "Enter a username to join the cricket discussion"}
-            </DialogDescription>
+            {!isAuthenticated && (
+              <DialogDescription>
+                {showRegistration 
+                  ? "Create a new chat account" 
+                  : "Enter a username to join the cricket discussion"}
+              </DialogDescription>
+            )}
           </div>
-          
-          {isAuthenticated && (
-            <Button variant="outline" size="sm" onClick={handleLogout} className="flex items-center gap-1">
-              <LogOut className="h-3 w-3" />
-              <span>Logout</span>
-            </Button>
-          )}
         </DialogHeader>
         
         {isAuthenticated ? (
-          <ChatComponent groupId={COMETCHAT_GROUPS.GLOBAL_GROUP} />
+          <ChatComponent />
         ) : showRegistration ? (
           <UserRegistrationForm 
             onSuccess={handleRegistrationSuccess}

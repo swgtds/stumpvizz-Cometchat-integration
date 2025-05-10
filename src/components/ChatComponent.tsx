@@ -27,7 +27,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   groupId = COMETCHAT_GROUPS.GLOBAL_GROUP,
   modern = false
 }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isJoined, setIsJoined] = useState(false);
@@ -36,6 +36,16 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Handle user logout
+  const handleLogout = async () => {
+    // Reset local state
+    setMessages([]);
+    setIsJoined(false);
+    
+    // Call auth context logout
+    await logout();
   };
 
   // Join group chart
@@ -59,11 +69,10 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
         try {
           await CometChat.joinGroup(groupId, CometChat.GroupType.Public, "");
         } catch (error: any) {
-          // If user is already joined, we can proceed
           if (error.code === "ERR_ALREADY_JOINED") {
             console.log("User is already a member of the group");
           } else {
-            throw error; // Re-throw other errors
+            throw error;
           }
         }
         
@@ -76,32 +85,29 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
           .setLimit(limit)
           .build();
           
-        // Safely extract data from message objects
         const previousMessages = await messagesRequest.fetchPrevious();
         const typedMessages: ChatMessage[] = previousMessages.map((msg: any) => {
-          let messageText = "";
-          
-          if (msg instanceof CometChat.TextMessage && typeof msg.getText === 'function') {
-            messageText = msg.getText();
+          if (msg instanceof CometChat.TextMessage) {
+            return {
+              id: String(msg.getId()),
+              text: msg.getText(),
+              sender: {
+                uid: msg.getSender().getUid(),
+                name: msg.getSender().getName()
+              },
+              sentAt: msg.getSentAt()
+            };
           }
-          
-          return {
-            id: msg.getId ? msg.getId() : String(Date.now()),
-            text: messageText,
-            sender: {
-              uid: msg.getSender ? msg.getSender().getUid() : 'unknown',
-              name: msg.getSender ? msg.getSender().getName() : undefined
-            },
-            sentAt: msg.getSentAt ? msg.getSentAt() : Date.now()
-          };
-        });
+          return null;
+        }).filter(Boolean) as ChatMessage[];
         
         setMessages(typedMessages);
+        scrollToBottom();
+
         CometChat.addMessageListener(
           listenerID.current,
           new CometChat.MessageListener({
             onTextMessageReceived: (textMessage: any) => {
-              // Only process messages from the current group
               if (textMessage && 
                   textMessage instanceof CometChat.TextMessage && 
                   typeof textMessage.getText === 'function' &&
@@ -109,20 +115,20 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
                 const receiver = textMessage.getReceiver();
                 if (receiver && receiver instanceof CometChat.Group && receiver.getGuid() === groupId) {
                   const typedMessage: ChatMessage = {
-                    id: textMessage.getId ? String(textMessage.getId()) : String(Date.now()),
-                    text: textMessage.getText ? textMessage.getText() : "",
+                    id: String(textMessage.getId()),
+                    text: textMessage.getText(),
                     sender: {
-                      uid: textMessage.getSender ? textMessage.getSender().getUid() : 'unknown',
-                      name: textMessage.getSender ? textMessage.getSender().getName() : undefined
+                      uid: textMessage.getSender().getUid(),
+                      name: textMessage.getSender().getName()
                     },
-                    sentAt: textMessage.getSentAt ? textMessage.getSentAt() : Date.now()
+                    sentAt: textMessage.getSentAt()
                   };
                   
                   setMessages((prevMessages) => [...prevMessages, typedMessage]);
                   scrollToBottom();
                 }
               }
-            },
+            }
           })
         );
       } catch (error) {
@@ -136,12 +142,12 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
       CometChat.removeMessageListener(listenerID.current);
     };
   }, [groupId, isAuthenticated, user]);
-  
-  // Scroll to bottom when messages change
+
+  // Add effect to scroll when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-  
+
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -156,26 +162,54 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
       
       const sentMessage = await CometChat.sendMessage(textMessage);
       
-      if (sentMessage && sentMessage instanceof CometChat.TextMessage && typeof sentMessage.getText === 'function') {
-
+      if (sentMessage && sentMessage instanceof CometChat.TextMessage) {
         const typedMessage: ChatMessage = {
-          id: sentMessage.getId ? String(sentMessage.getId()) : String(Date.now()),
-          text: sentMessage.getText ? sentMessage.getText() : "",
+          id: String(sentMessage.getId()),
+          text: sentMessage.getText(),
           sender: {
-            uid: sentMessage.getSender ? sentMessage.getSender().getUid() : 'unknown',
-            name: sentMessage.getSender ? sentMessage.getSender().getName() : undefined
+            uid: sentMessage.getSender().getUid(),
+            name: sentMessage.getSender().getName()
           },
-          sentAt: sentMessage.getSentAt ? sentMessage.getSentAt() : Date.now()
+          sentAt: sentMessage.getSentAt()
         };
         
         setMessages((prevMessages) => [...prevMessages, typedMessage]);
+        scrollToBottom();
       }
       setMessage('');
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
-  
+
+  const renderMessage = (msg: ChatMessage) => {
+    return (
+      <div
+        key={msg.id}
+        className={`flex ${
+          msg.sender.uid === user?.id ? "justify-end" : "justify-start"
+        } mb-4`}
+      >
+        <div className="group relative max-w-[85%]">
+          <div
+            className={`rounded-2xl px-4 py-2.5 ${
+              msg.sender.uid === user?.id
+                ? "bg-cricket-green text-white rounded-br-none"
+                : "bg-muted rounded-bl-none"
+            }`}
+          >
+            <div className="text-xs font-medium mb-1.5">
+              {msg.sender.uid === user?.id
+                ? "You"
+                : msg.sender.name || msg.sender.uid}
+            </div>
+            <p className="break-words text-sm leading-relaxed">{msg.text}</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (!isAuthenticated) {
     return (
       <Card>
@@ -188,7 +222,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
     );
   }
   
-  // Custom Chaut UI
+  // Custom Chat UI
   if (modern) {
     return (
       <Card className="w-full rounded-xl overflow-hidden shadow-lg border-0">
@@ -196,18 +230,29 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
           <div className="bg-gradient-to-r from-cricket-green/90 to-cricket-green text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
-              <h3 className="font-semibold">Live Match Chat</h3>
+              <h3 className="font-semibold">
+                {groupId === COMETCHAT_GROUPS.GLOBAL_GROUP ? "Cricket Fan Chat" : "Live Match Chat"}
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <div className="text-xs bg-white/20 px-2 py-1 rounded-full">
                 {messages.length} messages
               </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleLogout}
+                className="flex items-center gap-1 text-white hover:bg-white/20"
+              >
+                <LogOut className="h-3 w-3" />
+                <span>Logout</span>
+              </Button>
             </div>
           </div>
           
           <div className="p-4 pb-0">
             <p className="text-sm text-muted-foreground mb-4 bg-muted/30 p-3 rounded-lg">
-              Welcome to the group chat. Discuss the match with other fans in real-time.
+              Welcome to the group chat! Discuss the match with other fans in real-time.
             </p>
             
             <ScrollArea className="h-[320px] pr-4">
@@ -272,8 +317,19 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   return (
     <Card className="w-full">
       <CardContent className="p-4 h-[400px] flex flex-col">
-      <div className="flex justify-between items-center mb-3">
-          <h3 className="text-sm font-medium">Cricket Chat</h3>
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-sm font-medium">
+            {groupId === COMETCHAT_GROUPS.GLOBAL_GROUP ? "Cricket Fan Chat" : "Live Match Chat"}
+          </h3>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleLogout}
+            className="flex items-center gap-1 text-xs h-8"
+          >
+            <LogOut className="h-3 w-3" />
+            Logout
+          </Button>
         </div>
         <ScrollArea className="flex-grow h-[340px] mb-4">
           <div className="space-y-4 p-2">
