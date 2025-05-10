@@ -32,6 +32,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isJoined, setIsJoined] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const listenerID = useRef(`listener_${groupId}`);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -97,22 +98,29 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
         
         setMessages(typedMessages);
         CometChat.addMessageListener(
-          groupId,
+          listenerID.current,
           new CometChat.MessageListener({
             onTextMessageReceived: (textMessage: any) => {
-              if (textMessage && textMessage instanceof CometChat.TextMessage && typeof textMessage.getText === 'function') {
-                const typedMessage: ChatMessage = {
-                  id: textMessage.getId ? String(textMessage.getId()) : String(Date.now()),
-                  text: textMessage.getText ? textMessage.getText() : "",
-                  sender: {
-                    uid: textMessage.getSender ? textMessage.getSender().getUid() : 'unknown',
-                    name: textMessage.getSender ? textMessage.getSender().getName() : undefined
-                  },
-                  sentAt: textMessage.getSentAt ? textMessage.getSentAt() : Date.now()
-                };
-                
-                setMessages((prevMessages) => [...prevMessages, typedMessage]);
-                scrollToBottom();
+              // Only process messages from the current group
+              if (textMessage && 
+                  textMessage instanceof CometChat.TextMessage && 
+                  typeof textMessage.getText === 'function' &&
+                  textMessage.getReceiverType() === CometChat.RECEIVER_TYPE.GROUP) {
+                const receiver = textMessage.getReceiver();
+                if (receiver && receiver instanceof CometChat.Group && receiver.getGuid() === groupId) {
+                  const typedMessage: ChatMessage = {
+                    id: textMessage.getId ? String(textMessage.getId()) : String(Date.now()),
+                    text: textMessage.getText ? textMessage.getText() : "",
+                    sender: {
+                      uid: textMessage.getSender ? textMessage.getSender().getUid() : 'unknown',
+                      name: textMessage.getSender ? textMessage.getSender().getName() : undefined
+                    },
+                    sentAt: textMessage.getSentAt ? textMessage.getSentAt() : Date.now()
+                  };
+                  
+                  setMessages((prevMessages) => [...prevMessages, typedMessage]);
+                  scrollToBottom();
+                }
               }
             },
           })
@@ -125,7 +133,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
     joinGroup();
     
     return () => {
-      CometChat.removeMessageListener(groupId);
+      CometChat.removeMessageListener(listenerID.current);
     };
   }, [groupId, isAuthenticated, user]);
   

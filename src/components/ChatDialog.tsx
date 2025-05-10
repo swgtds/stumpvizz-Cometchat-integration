@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import UserRegistrationForm from "./UserRegistrationForm";
+import { COMETCHAT_GROUPS } from "@/config/cometchat";
 
 export const ChatDialog = () => {
   const { isAuthenticated, login, logout, user } = useAuth();
@@ -74,7 +74,7 @@ export const ChatDialog = () => {
         </DialogHeader>
         
         {isAuthenticated ? (
-          <ChatComponent />
+          <ChatComponent groupId={COMETCHAT_GROUPS.GLOBAL_GROUP} />
         ) : showRegistration ? (
           <UserRegistrationForm 
             onSuccess={handleRegistrationSuccess}
